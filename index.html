@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Will you be my valentine?</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#ff9a9e; --bg2:#fecfef; --accent:#ff476f; --card:#fff1f5;
+  }
+  html,body{height:100%; margin:0; font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial;}
+  body{
+    background: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.15), transparent 10%),
+                linear-gradient(135deg,var(--bg1),var(--bg2));
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    color:#2b0b1a;
+  }
+
+  .card{
+    width:100%; max-width:820px; background:linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.7));
+    border-radius:22px; box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    padding:36px; position:relative; overflow:hidden;
+  }
+
+  .hearts {
+    position:absolute; inset:0; pointer-events:none;
+  }
+  .title{
+    text-align:center; margin: 0 0 6px; font-weight:800; font-size:36px;
+    letter-spacing:0.6px;
+  }
+  .subtitle{ text-align:center; margin:6px 0 14px; font-weight:600; opacity:0.95; }
+  .question{ text-align:center; font-size:20px; margin:10px 0 20px; }
+
+  .hint{
+    text-align:center; margin-bottom:18px; font-size:15px; color:#5c2232;
+  }
+
+  .btns{ display:flex; gap:18px; justify-content:center; align-items:center; margin-top:8px;}
+  button{
+    cursor:pointer; padding:12px 20px; border-radius:12px; border:0; font-weight:700;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    transform: translateZ(0);
+  }
+  .yes{ background: linear-gradient(90deg,#ea1b47,#fa6681); color:white; }
+  .no{ background: linear-gradient(90deg,#fff9f9,#ffe6ef); color:#d12b58; border:2px solid rgba(209,43,88,0.08); position:relative; }
+
+  /* Success view */
+  .success{ text-align:center; padding:18px; animation:fadeIn .6s ease both; }
+  .yay{ font-size:44px; font-weight:800; color:var(--accent); margin:8px 0; }
+  .best{ font-size:20px; margin-bottom:12px; }
+  .gif-wrap{ display:flex; justify-content:center; margin:12px 0 8px; }
+  .gif{ max-width:90%; border-radius:12px; box-shadow:0 12px 30px rgba(0,0,0,0.12); }
+
+  .love-line{ margin-top:12px; font-size:18px; font-weight:600; color:#4b1320; }
+
+  /* confetti placeholders */
+  .confetti{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+
+  /* small responsive */
+  @media (max-width:520px){
+    .title{ font-size:28px; } .yay{ font-size:34px; }
+    button{ padding:10px 14px; }
+  }
+
+  @keyframes fadeIn { from {opacity:0; transform:translateY(8px);} to {opacity:1; transform:none;} }
+
+  /* animated floating hearts in background */
+  .heart{
+    position:absolute; font-size:24px; opacity:0.14;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(30px) scale(0.9); opacity:0.12; }
+    50% { opacity:0.22; }
+    100% { transform: translateY(-120%) scale(1.2); opacity:0; }
+  }
+
+  .small-note{ text-align:center; margin-top:10px; color:#6b2b3b; font-size:13px; }
+  .reset{ display:block; margin:14px auto 0; background:transparent; color:#6b2b3b; border:2px dashed rgba(107,43,59,0.12); padding:8px 10px; border-radius:10px; }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="hearts" id="hearts"></div>
+    <div id="mainContent">
+      <!-- Initial view -->
+      <h1 class="title" id="line1">Hello Ms. Psycho 💫</h1>
+      <div class="subtitle" id="line2">Dr. Archa Jain</div>
+      <div class="question">Will you be my valentine? 💘</div>
+      <div class="hint">If you think I have to improve for that pls click <strong>No</strong> — I have something for u behind that ✨</div>
+
+      <div class="btns">
+        <button class="yes" id="yesBtn">Yes ❤️</button>
+        <button class="no" id="noBtn">No 😅</button>
+      </div>
+    </div>
+
+    <div id="successContent" style="display:none;">
+      <div class="success">
+        <div class="yay">Yayyy!! 🎉</div>
+        <div class="best">Best decision ever 💍</div>
+
+        <div class="gif-wrap">
+          <!-- Insert user's gif link here via JS variable -->
+          <img src="" alt="celebration gif" class="gif" id="celebrationGif" />
+        </div>
+        <div class="love-line">No escape now 😌💖</div>
+        <div class="love-line">So let’s take this “yes” and carry it with us — until we’re always each other's. 💍❤️</div>
+        <div style="font-size:20px; margin-top:10px; font-weight:700;">I love u buddhu 💖😘</div>
+        <button class="reset" id="resetBtn">Reset (for testing)</button>
+      </div>
+    </div>
+
+    <div class="confetti" id="confetti"></div>
+  </div>
+
+<script>
+/*
+  Customize these:
+  - GIF_URL: put your gif URL here (must be an image/gif link, e.g. from Giphy or Imgur)
+  - NAME_LINE_1 and NAME_LINE_2: change displayed headings (optional)
+*/
+const GIF_URL = "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif"; // <-- replace with your GIF link
+const NAME_LINE_1 = "Hello Ms. Psycho 💫";      // displayed line 1
+const NAME_LINE_2 = "Dr. Archa Jain";          // displayed line 2
+
+// apply names (quick customization)
+document.getElementById('line1').textContent = NAME_LINE_1;
+document.getElementById('line2').textContent = NAME_LINE_2;
+
+// elements
+const noBtn = document.getElementById('noBtn');
+const yesBtn = document.getElementById('yesBtn');
+const card = document.getElementById('card');
+const mainContent = document.getElementById('mainContent');
+const successContent = document.getElementById('successContent');
+const celebrationGif = document.getElementById('celebrationGif');
+const resetBtn = document.getElementById('resetBtn');
+const confettiEl = document.getElementById('confetti');
+const heartsContainer = document.getElementById('hearts');
+
+// show initial or success depending on localStorage
+const acceptedFlag = localStorage.getItem('valentine_accepted_v1');
+if (acceptedFlag === 'true') {
+  showSuccess();
+} else {
+  showInitial();
+}
+
+// NO button dodge logic
+function randomPositionForNo() {
+  const containerRect = card.getBoundingClientRect();
+  const btnRect = noBtn.getBoundingClientRect();
+  const padding = 12; // avoid edges
+  const maxX = containerRect.width - btnRect.width - padding*2;
+  const maxY = containerRect.height - btnRect.height - padding*2;
+  const x = Math.max(padding, Math.floor(Math.random() * (maxX || 1)) + padding);
+  const y = Math.max(padding, Math.floor(Math.random() * (maxY || 1)) + padding);
+  noBtn.style.position = 'absolute';
+  noBtn.style.left = x + 'px';
+  noBtn.style.top = y + 'px';
+  noBtn.style.transition = 'transform 0.12s ease';
+}
+
+// On small devices, make dodging a bit less jumpy
+let dodgeCount = 0;
+noBtn.addEventListener('mouseenter', (e) => {
+  dodgeCount++;
+  // If user long-presses on mobile, push away more
+  for (let i=0;i<1 + (dodgeCount>6?2:0); i++){
+    randomPositionForNo();
+  }
+});
+
+// Keep "No" from being clicked - prevent pointerdown click if it somehow gets clicked
+noBtn.addEventListener('click', (e)=>{
+  e.preventDefault();
+  randomPositionForNo();
+});
+
+// YES button sets flag and reloads (as requested)
+yesBtn.addEventListener('click', ()=>{
+  localStorage.setItem('valentine_accepted_v1', 'true');
+  // small animation before reload
+  yesBtn.textContent = "Sealing it... ❤️";
+  setTimeout(()=> location.reload(), 700);
+});
+
+// Reset for testing
+resetBtn.addEventListener('click', ()=>{
+  localStorage.removeItem('valentine_accepted_v1');
+  location.reload();
+});
+
+function showInitial(){
+  mainContent.style.display = '';
+  successContent.style.display = 'none';
+  // ensure noBtn starts in flow
+  noBtn.style.position = '';
+  noBtn.style.left = '';
+  noBtn.style.top = '';
+  // spawn hearts
+  spawnHearts();
+}
+
+// success view
+function showSuccess(){
+  mainContent.style.display = 'none';
+  successContent.style.display = '';
+  celebrationGif.src = GIF_URL;
+  startConfetti();
+}
+
+// simple confetti (vanilla)
+function startConfetti() {
+  // tiny confetti algorithm
+  const colors = ["#FF6B8A","#FFD1E6","#FF4D6D","#FFF2F6","#FF8AB6"];
+  const count = 28;
+  for (let i=0;i<count;i++){
+    const el = document.createElement('div');
+    el.style.position = 'absolute';
+    el.style.width = Math.random()*12 + 6 + 'px';
+    el.style.height = Math.random()*8 + 6 + 'px';
+    el.style.left = Math.random()*100 + '%';
+    el.style.top = -20 - Math.random()*60 + 'px';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.opacity = 0.95;
+    el.style.borderRadius = (Math.random()*50)+'%';
+    el.style.transform = 'rotate('+ (Math.random()*360) +'deg)';
+    el.style.pointerEvents = 'none';
+    el.style.transition = 'transform 2.4s linear, top 2.4s linear, left 2.4s linear, opacity 0.5s linear';
+    confettiEl.appendChild(el);
+    (function(e,i){
+      setTimeout(()=>{
+        e.style.top = 120 + Math.random()*40 + '%';
+        e.style.left = (Math.random()*90) + '%';
+        e.style.transform = 'translateY(40px) rotate('+ (Math.random()*720) +'deg) scale(1.1)';
+      }, 20 + i*30);
+      setTimeout(()=> {
+        e.style.opacity = 0;
+        setTimeout(()=> e.remove(), 1000);
+      }, 2400 + Math.random()*600);
+    })(el,i);
+  }
+}
+
+// floating hearts in background
+function spawnHearts(){
+  heartsContainer.innerHTML = '';
+  const heartChars = ['💖','💕','❤️','💘','😍'];
+  for (let i=0;i<12;i++){
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.style.left = Math.random()*95 + '%';
+    h.style.top = (60 + Math.random()*40) + '%';
+    h.style.fontSize = (12 + Math.random()*36) + 'px';
+    h.style.animationDuration = (6 + Math.random()*8) + 's';
+    h.style.animationDelay = (Math.random()*2) + 's';
+    h.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
+    heartsContainer.appendChild(h);
+  }
+}
+
+// on resize, nudge noBtn back into bounds
+window.addEventListener('resize', ()=>{
+  // keep within
+  if (noBtn.style.position === 'absolute') {
+    const rect = card.getBoundingClientRect();
+    const btn = noBtn.getBoundingClientRect();
+    const padding = 12;
+    let left = parseFloat(noBtn.style.left || 0);
+    let top = parseFloat(noBtn.style.top || 0);
+    left = Math.min(Math.max(left, padding), Math.max(0, rect.width - btn.width - padding));
+    top  = Math.min(Math.max(top, padding), Math.max(0, rect.height - btn.height - padding));
+    noBtn.style.left = left + 'px';
+    noBtn.style.top = top + 'px';
+  }
+});
+
+// initial spawn
+spawnHearts();
+
+</script>
+</body>
+</html>
